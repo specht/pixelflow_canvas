@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pixelflow_canvas (0.2.0)
+    pixelflow_canvas (0.3.0)
 
 GEM
   remote: https://rubygems.org/
