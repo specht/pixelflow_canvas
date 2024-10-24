@@ -256,7 +256,7 @@ const vga_palette = [
     0x00, 0x00, 0x00,
     0x00, 0x00, 0x00,
 ];
-var palette = vga_palette;
+var palette = [...vga_palette];
 const canvas = document.getElementById('pixelstream_canvas');
 var crt_width = canvas.width;
 var crt_height = canvas.height;
@@ -299,6 +299,7 @@ window.addEventListener('message', event => {
         if (message.command === 'reset') {
             x = 0;
             y = 0;
+            palette = [...vga_palette];
         } else if (message.command === 'set_size') {
             canvas.width = message.width;
             canvas.height = message.height;
@@ -314,6 +315,9 @@ window.addEventListener('message', event => {
             palette[message.i * 3 + 0] = message.r;
             palette[message.i * 3 + 1] = message.g;
             palette[message.i * 3 + 2] = message.b;
+        } else if (message.command === 'move_to') {
+            x = message.x;
+            y = message.y;
         } else if (message.command === 'set_pixel') {
             let color = message.color;
             let offset = y * crt_width + x;

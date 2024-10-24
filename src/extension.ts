@@ -56,13 +56,13 @@ export function activate(context: vscode.ExtensionContext) {
                 // SET_ADVANCE
                 messages.push({ command: 'set_advance_mode', mode: queue[offset + 1] });
                 offset += 2;
-            } else if (command === 5 && queue.length >= offset + 1 + (crt_width < 256 ? 1 : 2) + (crt_height < 256 ? 1 : 2)) {
+            } else if (command === 5 && queue.length >= offset + 1 + (crt_width <= 256 ? 1 : 2) + (crt_height <= 256 ? 1 : 2)) {
                 // MOVE_TO
                 offset += 1;
                 let x = queue[offset++];
-                if (crt_width >= 256) { x = x * 256 + queue[offset++]; }
+                if (crt_width > 256) { x = x * 256 + queue[offset++]; }
                 let y = queue[offset++];
-                if (crt_height >= 256) { y = y * 256 + queue[offset++]; }
+                if (crt_height > 256) { y = y * 256 + queue[offset++]; }
                 messages.push({ command: 'move_to', x: x, y: y });
             } else if (command === 6 && queue.length >= offset + 1 + (color_mode === 0 ? 3 : 1)) {
                 // SET_PIXEL
@@ -89,6 +89,8 @@ export function activate(context: vscode.ExtensionContext) {
         offset = 0;
         if (panel !== null) {
             panel.webview.postMessage([{ command: 'reset' }]);
+            panel.webview.postMessage([{ command: 'set_size', width: 320, height: 180 }]);
+            panel.webview.postMessage([{ command: 'set_color_mode', mode: 0 }]);
         }
 
 
