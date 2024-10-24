@@ -14,26 +14,7 @@
 #define DRAW_DIRECT 0
 #define DRAW_BUFFERED 1
 
-typedef struct {
-    int width;
-    int height;
-    int x;
-    int y;
-    int color_mode;
-    int advance_mode;
-    int draw_mode;
-    unsigned char *palette;
-    unsigned char *screen;
-    int socket_fd;
-    double last_timestamp;
-} Canvas;
-
-void set_size(Canvas *canvas, int width, int height);
-void set_color_mode(Canvas *canvas, int mode);
-void recreate_screen(Canvas *canvas);
-void move_to(Canvas *canvas, int x, int y);
-void set_pixel(Canvas *canvas, int x, int y, int r, int g, int b);
-void flip(Canvas *canvas);
+#include "pixelflow_canvas.h"
 
 double current_time() {
     struct timespec ts;
@@ -126,7 +107,6 @@ void move_to(Canvas *canvas, int x, int y) {
         buffer[size++] = (y >> 8) & 0xff;
         buffer[size++] = y & 0xff;
     }
-    printf("%d %d %d\n", x, y, size);
 
     write(canvas->socket_fd, buffer, size);
     fsync(canvas->socket_fd);
@@ -137,7 +117,6 @@ void set_pixel(Canvas *canvas, int x, int y, int r, int g, int b) {
     if (x != canvas->x || y != canvas->y) {
         move_to(canvas, x, y);
     }
-    printf("set_pixel %d %d %d %d %d\n", x, y, r, g, b);
 
     if (canvas->color_mode == RGB) {
         int offset = (y * canvas->width + x) * 3;
