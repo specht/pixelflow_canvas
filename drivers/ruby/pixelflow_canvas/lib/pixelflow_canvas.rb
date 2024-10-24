@@ -73,6 +73,22 @@ module Pixelflow
             @draw_mode = mode
         end
 
+        def flip()
+            if @draw_mode == :buffered
+                @socket.write([7].pack('C'))
+                @socket.write(@screen.pack('C*'))
+                @socket.flush
+            end
+        end
+
+        def ensure_max_fps(fps)
+            fps1 = 1.0 / fps
+            t = Time.now.to_f
+            dt = t - @last_timestamp
+            sleep(fps1 - dt) if dt < fps1
+            @last_timestamp = t
+        end
+
         def set_palette(i, r, g, b)
             i = i % 256
             r = (r % 256) << 2
@@ -146,22 +162,6 @@ module Pixelflow
             else
                 return @screen[y * @width + x]
             end
-        end
-
-        def flip()
-            if @draw_mode == :buffered
-                @socket.write([7].pack('C'))
-                @socket.write(@screen.pack('C*'))
-                @socket.flush
-            end
-        end
-
-        def ensure_max_fps(fps)
-            fps1 = 1.0 / fps
-            t = Time.now.to_f
-            dt = t - @last_timestamp
-            sleep(fps1 - dt) if dt < fps1
-            @last_timestamp = t
         end
 
         def draw_rect(x0, y0, x1, y1, color)

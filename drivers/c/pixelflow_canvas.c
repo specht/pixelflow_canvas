@@ -96,6 +96,7 @@ void canvas_flip() {
         unsigned char buffer[1];
         buffer[0] = 7;
         write(socket_fd, buffer, 1);
+        write(socket_fd, screen, width * height * (color_mode == COLOR_MODE_RGB ? 3 : 1));
         fsync(socket_fd);
     }
 }
