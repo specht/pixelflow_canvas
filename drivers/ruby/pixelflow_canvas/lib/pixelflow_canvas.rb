@@ -33,22 +33,6 @@ module Pixelflow
             @last_timestamp = Time.now.to_f
         end
 
-        def run(&block)
-            yield(self)
-        end
-
-        def recreate_screen()
-            @screen = [0] * @width * @height * (@color_mode == :rgb ? 3 : 1)
-        end
-
-        def set_draw_mode(mode)
-            unless DRAW_MODES.keys.include?(mode)
-                raise "Invalid draw mode: #{mode}"
-            end
-            @draw_mode = mode
-            recreate_screen()
-        end
-
         def set_size(width, height)
             @x = 0
             @y = 0
@@ -57,6 +41,10 @@ module Pixelflow
             recreate_screen()
             @socket.write([1, width, height].pack('Cnn'))
             @socket.flush
+        end
+
+        def recreate_screen()
+            @screen = [0] * @width * @height * (@color_mode == :rgb ? 3 : 1)
         end
 
         def set_color_mode(mode)
@@ -69,15 +57,7 @@ module Pixelflow
             @socket.flush
         end
 
-        def set_palette(i, r, g, b)
-            i = i % 256
-            r = (r % 256) << 2
-            g = (g % 256) << 2
-            b = (b % 256) << 2
-            @socket.write([3, i, r, g, b].pack('CCCCC'))
-        end
-
-        def set_advance(mode)
+        def set_advance_mode(mode)
             unless ADVANCE_MODES.keys.include?(mode)
                 raise "Invalid advance mode: #{mode}"
             end
@@ -86,11 +66,24 @@ module Pixelflow
             @socket.flush
         end
 
+        def set_draw_mode(mode)
+            unless DRAW_MODES.keys.include?(mode)
+                raise "Invalid draw mode: #{mode}"
+            end
+            @draw_mode = mode
+        end
+
+        def set_palette(i, r, g, b)
+            i = i % 256
+            r = (r % 256) << 2
+            g = (g % 256) << 2
+            b = (b % 256) << 2
+            @socket.write([3, i, r, g, b].pack('CCCCC'))
+        end
+
         def move_to(x, y)
-            x0 = x0.to_i
-            y0 = y0.to_i
-            x1 = x1.to_i
-            y1 = y1.to_i
+            x = x.to_i
+            y = y.to_i
             return if x < 0 || x >= @width || y < 0 || y >= @height
             @x = x
             @y = y
